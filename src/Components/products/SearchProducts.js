@@ -29,9 +29,7 @@ export default class SearchProducts extends Component {
     }
     
     render(){
-        
         return( 
-		
 			<Form inline onSubmit={this.handleSubmit}>
 			<FormControl type="text" placeholder="Searching by name product" className="mr-sm-2" value={this.state.todoItem} onChange	={this.handleChange} required/>
 			<Link to={'/getsearching/' + this.state.todoItem}><Button variant="primary" type="submit" ><i class="material-icons">youtube_searched_for</i></Button></Link>

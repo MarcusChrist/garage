@@ -29,7 +29,7 @@ export default class GetSearching extends Component {
     }
 
     componentDidMount() {
-        
+        console.log("hej")
         let url = `http://localhost:8080/products/`
         
         const { name } = this.props.match.params;

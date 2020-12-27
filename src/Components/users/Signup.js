@@ -59,40 +59,40 @@ export default class Signup extends Component {
                 <div className='col-6' style={{backgroundColor  : 'hsla(218, 100%, 50%, 0.3)'}}>
                   <div style={{textAlign : 'center'}}>                  
                     <span>
-                      Signup
+                      Skapa inloggning
                     </span>
                   </div>
                   <Form>
                     <Form.Group>
                       <Form.Text>
-                        Name : 
+                        Ditt Namn : 
                       </Form.Text>
-                      <Form.Control type="text" name="name" placeholder="Enter name" onChange={this._handleChange} />
+                      <Form.Control type="text" name="name" placeholder="Skriv in för och efternamn" onChange={this._handleChange} />
                     </Form.Group>
 
                     <Form.Group>
                       <Form.Text>
-                        Username : 
+                        Användarnamn : 
                       </Form.Text>
-                      <Form.Control type="text" name="username" placeholder="Enter username" onChange={this._handleChange} />
+                      <Form.Control type="text" name="username" placeholder="Välj ett unikt och kort användarnamn" onChange={this._handleChange} />
                     </Form.Group>
 
                     <Form.Group>
                       <Form.Text>
                         Email : 
                       </Form.Text>
-                      <Form.Control type="email" name="email" placeholder="Enter email" onChange={this._handleChange} />
+                      <Form.Control type="email" name="email" placeholder="Skriv din email" onChange={this._handleChange} />
                     </Form.Group>
 
                     <Form.Group>
                       <Form.Text>
-                        Password : 
+                        Lösenord : 
                       </Form.Text>
-                      <Form.Control type="password" name="password" placeholder="Enter password" onChange={this._handleChange} />
+                      <Form.Control type="password" name="password" placeholder="Skriv ditt lösenord" onChange={this._handleChange} />
                     </Form.Group>
 
                     <Button variant='primary' type='submit' onClick={this.handleFormSubmit}>
-                      Login
+                      Klar!
                     </Button>
                     <div>
                     <Link className="link" to="/login">Already have an account? <span className="link-signup">Login</span></Link>

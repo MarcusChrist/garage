@@ -20,8 +20,14 @@ export default class AuthService {
                 password
             })
         }).then(res => {
-            this.setToken(res.token) // Setting the token in localStorage
-            return Promise.resolve(res);
+            if (res.status === 400) {
+                console.log("login failed")
+                return Promise.reject(res);
+            } else {
+                console.log("logged in!")
+                this.setToken(res.token) // Setting the token in localStorage
+                return Promise.resolve(res);
+            }
         })
     }
 

@@ -6,7 +6,7 @@ import Headers from '../page/Header';
 import empty from '../../assets/Ellipsis-1s-100px.gif'
 const token = localStorage.getItem('token');
 
-class SingleProducts extends Component {
+class ScanProduct extends Component {
     state = {
         item: {},
         quantity: 0,
@@ -14,15 +14,15 @@ class SingleProducts extends Component {
         isLoading: true
     }
     componentWillMount() {
-        const {id} = this.props.match.params;
-        axios.get(`/products/${id}`)
-        .then(res =>
-        {
+        // const {id} = this.props.match.params;
+        // axios.get(`/products/${id}`)
+        // .then(res =>
+        // {
 
-        setTimeout(() => this.setState({item: res.data.data[0], isLoading: false}), 500);
+        // setTimeout(() => this.setState({item: res.data.data[0], isLoading: false}), 500);
 
-        })
-        .catch(err => console.log(err))
+        // })
+        // .catch(err => console.log(err))
     }
     AddReduceQty = e => {
         const {id} = this.props.match.params
@@ -55,9 +55,9 @@ class SingleProducts extends Component {
 
     }
     render() {
-        const {id, name, description, image, category, quantity} = this.state.item;
+        const {id_product, name, description, image, category, quantity} = this.state.item;
         const {deleted} = this.state
-        if(deleted === true) {
+        if(deleted === true){
           return (<Redirect push to='/'/>)
         }
 
@@ -84,7 +84,7 @@ class SingleProducts extends Component {
                   <Card.Text>{category}</Card.Text>
               </Card.Body>
               <Card.Body>
-              <Link to={`/products/edit/` + id}><Button variant="primary">Edit</Button></Link>
+              <Link to={`/products/edit/` + id_product}><Button variant="primary">Edit</Button></Link>
               <Button variant="primary" onClick={this.AddReduceQty}>add</Button>
               <Button variant="warning" onClick={this.AddReduceQty}>reduce</Button>
               <Button variant="danger" onClick={this.DeleteProduct}>delete</Button>
@@ -94,4 +94,4 @@ class SingleProducts extends Component {
         )
     }
 }
-export default SingleProducts
+export default ScanProduct

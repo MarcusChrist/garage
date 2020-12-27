@@ -26,10 +26,12 @@ class Login extends Component {
     /* Here is where all the login logic will go. Upon clicking the login button, we would like to utilize a login method that will send our entered credentials over to the server for verification. Once verified, it should store your token and send you to the protected route. */
     this.Auth.login(this.state.email, this.state.password)
       .then(res => {
+        console.log(res);
         this.props.history.replace("/");
       })
       .catch(err => {
-        alert(err);
+        console.log(err);
+        alert(err.message);
       });
 
 
@@ -50,10 +52,10 @@ class Login extends Component {
                 <div className='col-6' style={{backgroundColor  : 'hsla(218, 100%, 50%, 0.3)'}}>
                   <div style={{textAlign : 'center'}}>                  
                     <span>
-                      Inventory App
+                    Uppsala Veterinärmottagning
                     </span><br />
                     <span>
-                      Account Login
+                      Logga in
                     </span>
                   </div>
 
@@ -62,20 +64,20 @@ class Login extends Component {
                       <Form.Text>
                         Email : 
                       </Form.Text>
-                      <Form.Control type="email" name="email" placeholder="Enter email" onChange={this._handleChange} />
+                      <Form.Control type="email" name="email" placeholder="Skriv din email" onChange={this._handleChange} />
                       
                     </Form.Group>
                     <Form.Group>
                       <Form.Text>
-                        Password : 
+                        Lösenord : 
                       </Form.Text>
-                      <Form.Control type="password" name="password" placeholder="Enter password" onChange={this._handleChange} />
+                      <Form.Control type="password" name="password" placeholder="Skriv ditt Lösenord" onChange={this._handleChange} />
                     </Form.Group>
                     <Button variant='primary' type='submit' onClick={this.handleFormSubmit}>
-                      Login
+                      Logga in
                     </Button>
                     <div>
-                      <Link className="center" to="/register">Dont have an account? <span>Signup</span></Link>
+                      <Link className="center" to="/register">Har du inte ett account? <span>Skaffa ett!</span></Link>
                     </div>
                   </Form>
                 </div>

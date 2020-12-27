@@ -11,11 +11,14 @@ export default function withAuth(AuthComponent) {
           };
 
           componentDidMount() {
+            console.log("1")
             if (!Auth.loggedIn()) {
+              console.log("2")
                 this.props.history.replace('/login')
             }
             else {
                 try {
+                  console.log("3")
                     const confirm = Auth.getConfirm()
                     this.setState({
                         confirm: confirm,
@@ -23,6 +26,8 @@ export default function withAuth(AuthComponent) {
                     })
                 }
                 catch(err){
+                  console.log("4")
+                  console.log(err);
                     Auth.logout()
                     this.props.history.replace('/login')
                 }
@@ -30,6 +35,7 @@ export default function withAuth(AuthComponent) {
         }
 
         render() {
+          console.log("0")
             if (this.state.loaded === true) {
               if (this.state.confirm) {
                 console.log("confirmed!");
@@ -44,6 +50,7 @@ export default function withAuth(AuthComponent) {
                 return console.log("not confirmed!");
               }
             } else {
+              console.log("not loaded")
               return null;
             }
           }

@@ -23,13 +23,14 @@ class App extends Component {
 
       return (
         <div>
-          <Navbar bg="primary" expand="lg">
-            <Navbar.Brand href="/">Inventory App</Navbar.Brand>
+          <Navbar bg="grey" expand="lg">
+            <Navbar.Brand href="/">Uppsala Veterinärmottagning</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mr-auto">
-                <Nav.Link><Link to='/'>Home</Link></Nav.Link>
-                <Nav.Link><Link to='/add'>Add Product</Link></Nav.Link>
+                <Nav.Link><Link to='/'>Hem</Link></Nav.Link>
+                <Nav.Link><Link to='/add'>Ny Produkt</Link></Nav.Link>
+                {/* <Nav.Link><Link to='/scan'>Inventera</Link></Nav.Link> */}
                 </Nav>
                 <Button variant="danger" type="submit" onClick={this._handleLogout}>
                   Logout
@@ -38,10 +39,8 @@ class App extends Component {
           </Navbar>
           <br/>
           <div>
-             <Products />
+             <Products fixHist={this.props.history}/>
           </div>
-
-
         </div>
 
       );
