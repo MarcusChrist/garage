@@ -6,9 +6,10 @@ import { Navbar, Nav, Button } from 'react-bootstrap'
 import {Link} from 'react-router-dom'
 import SearchProducts from '../products/SearchProducts'
 import GetProducts from '../products/GetProducts';
+import { WebUrl } from '../../api/config';
 
 
-axios.defaults.baseURL = 'http://localhost:8080';
+axios.defaults.baseURL = WebUrl;
 class Home extends Component {
   
   Auth = new AuthService();

@@ -3,6 +3,7 @@ import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { Link, Redirect } from 'react-router-dom'
 import axios from 'axios';
 import { Scanner } from '../../functions/Scanner';
+import { WebUrl } from '../../api/config';
 class CreateProduct extends Component {
 
     constructor(props) {
@@ -104,8 +105,7 @@ class CreateProduct extends Component {
     }
 
     editCode = e => {
-        console.log(e);
-        axios.get(`http://localhost:8080/products/${"_" + e}`)
+        axios.get(WebUrl + `/products/${"_" + e}`)
             .then(res => {
                 console.log(res);
                 if (res.data.data) {

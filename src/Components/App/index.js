@@ -7,8 +7,9 @@ import {Link} from 'react-router-dom'
 // import SearchProducts from '../products/SearchProducts'
 // import GetProducts from '../products/GetProducts';
 import Products from '../products/NewProducts';
+import { WebUrl } from '../../api/config';
 
-axios.defaults.baseURL = 'http://localhost:8080';
+axios.defaults.baseURL = WebUrl;
 class App extends Component {
 
   Auth = new AuthService();

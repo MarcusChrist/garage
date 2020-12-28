@@ -4,6 +4,7 @@ import React, {Component} from "react";
 import axios from "axios";
 import { Link } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
+import { WebUrl } from '../../api/config';
 
 export default class Signup extends Component {
 
@@ -29,7 +30,7 @@ export default class Signup extends Component {
       e.preventDefault();
     
       //Add this part right here
-      axios.post(`http://localhost:8080/user/register`, {
+      axios.post(WebUrl + '/user/register', {
           name: this.state.name,
           username : this.state.username,
           email: this.state.email,

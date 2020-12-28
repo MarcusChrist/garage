@@ -4,6 +4,7 @@ import {Link, Redirect} from 'react-router-dom'
 import { Card, Button } from 'react-bootstrap';
 import Headers from '../page/Header';
 import empty from '../../assets/Ellipsis-1s-100px.gif'
+import { WebUrl } from '../../api/config';
 const token = localStorage.getItem('token');
 
 class ScanProduct extends Component {
@@ -45,7 +46,7 @@ class ScanProduct extends Component {
     DeleteProduct = e => {
         e.preventDefault();
         const {id} = this.props.match.params
-        axios.delete(`http://localhost:8080/products/${id}`, {headers : {authorization : token }})
+        axios.delete(WebUrl + '/products/' + id, {headers : {authorization : token }})
         .then(this.setState({deleted: true}))
         .catch(err => console.log(err))
         // this.setState({

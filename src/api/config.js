@@ -1,7 +1,7 @@
 
 
 //Development
-export const WebUrl = "http://localhost:3000/";
+export const WebUrl = "http://localhost:8080";
 export const NonAuthUrl = "https://fde993e9a481.ngrok.io/api/v1/";
 
 //Production

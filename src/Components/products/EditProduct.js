@@ -19,6 +19,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import { WebUrl } from '../../api/config';
 
 function refreshPage() {
     window.location.reload(false);
@@ -39,7 +40,7 @@ class EditProduct extends Component {
     componentDidMount() {
         const { id } = this.props.match.params;
 
-        axios.get(`http://localhost:8080/products/${id}`)
+        axios.get(WebUrl + `/products/${id}`)
             .then(res => {
                 for (var key in res.data.data[0]) {
                     if (key === 'history') {
@@ -52,7 +53,7 @@ class EditProduct extends Component {
             })
             .catch(err => console.log(err))
 
-        axios.get('http://localhost:8080/categories')
+        axios.get(WebUrl + '/categories')
             .then(response => this.setState({ categories: response.data.data }))
     }
 
@@ -65,7 +66,7 @@ class EditProduct extends Component {
     }
 
     editCode = e => {
-        axios.get('http://localhost:8080/products?codefinder=_' + e)
+        axios.get(WebUrl + '/products?codefinder=_' + e)
             .then(res => {
                 if (res.data.data) {
                     console.log(res.data.data);

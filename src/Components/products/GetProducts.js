@@ -3,6 +3,7 @@ import axios from 'axios';
 import {Link} from 'react-router-dom';
 import {Button, Card, Container, Row} from 'react-bootstrap';
 import QueryAction from './QueryAction'
+import { WebUrl } from '../../api/config';
 const Todo = props => (
     <React.Fragment>
 
@@ -39,7 +40,7 @@ export default class GetProducts extends Component {
 
     componentDidMount() {
         const {search, sortBy, sort, limit, page} =this.state.query
-        axios.get(`http://localhost:8080/products/?search=${search}&sortBy=${sortBy}&sort=${sort}&limit=${limit}&page=${page}`)
+        axios.get(WebUrl + `/products/?search=${search}&sortBy=${sortBy}&sort=${sort}&limit=${limit}&page=${page}`)
         .then(res =>{
             this.setState({item: res.data.data})
         })
@@ -49,7 +50,7 @@ export default class GetProducts extends Component {
     queryString = (data) => {
         this.setState({query: data})
         const {search, sortBy, sort, limit, page} =this.state.query;
-        axios.get(`http://localhost:8080/products/?search=${search}&sortBy=${sortBy}&sort=${sort}&limit=${limit}&page=${page}`)
+        axios.get(WebUrl + `/products/?search=${search}&sortBy=${sortBy}&sort=${sort}&limit=${limit}&page=${page}`)
         .then(res => this.setState({item: res.data.data, loading : true}))
         .catch(err => console.log(err))
     }

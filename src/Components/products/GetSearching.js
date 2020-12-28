@@ -3,6 +3,7 @@ import Headers from '../page/Header'
 import axios from 'axios';
 import {Link} from 'react-router-dom';
 import {Button, Card} from 'react-bootstrap';
+import { WebUrl } from '../../api/config';
 const Todo = props => (
     <React.Fragment>
 
@@ -29,8 +30,7 @@ export default class GetSearching extends Component {
     }
 
     componentDidMount() {
-        console.log("hej")
-        let url = `http://localhost:8080/products/`
+        let url = WebUrl + '/products/';
         
         const { name } = this.props.match.params;
         

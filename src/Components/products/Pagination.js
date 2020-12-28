@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Redirect } from 'react-router-dom'
 import GridItem from '../../functions/GridItem';
 import GridContainer from '../../functions/GridContainer';
+import { WebUrl } from '../../api/config';
 //import { Link } from 'react-router-dom';
 
 class Pagination extends Component {
@@ -32,7 +33,7 @@ class Pagination extends Component {
 	}
 	editCode = e => {
 		console.log(e);
-		axios.get('http://localhost:8080/products?codefinder=_' + e)
+		axios.get(WebUrl + '/products?codefinder=_' + e)
 			.then(res => {
 				if (res.data.data) {
 					console.log(e);
