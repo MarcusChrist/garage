@@ -7,10 +7,11 @@ export default class AuthService {
     // Initializing important variables
     constructor(domain) {
         console.log(domain);
-        //this.domain = domain || WebUrl + '/user' // API server domain
-        // this.fetch = this.fetch.bind(this) // React binding stuff
-        // this.login = this.login.bind(this)
-        // this.getProfile = this.getProfile.bind(this)
+        this.domain = domain || WebUrl + '/user' // API server domain
+        console.log(this.domain);
+        //this.fetch = this.fetch.bind(this) // React binding stuff
+        //this.login = this.login.bind(this)
+        //this.getProfile = this.getProfile.bind(this)
     }
 
     login(email, password) {
