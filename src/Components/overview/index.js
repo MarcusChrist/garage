@@ -40,16 +40,28 @@ function Row(props) {
   const { row, newDate, oldDate} = props;
   const [open, setOpen] = React.useState(false);
   const classes = useRowStyles();
-  const history = JSON.parse(row.history);
   var fix = 0;
 
-  if (!history) {
+  // const history = JSON.parse(row.history);
 
-  } else if (new Date(history[0].date) > newDate) {
-    fix = 1;
-  } else if (new Date(history[0].date) < oldDate) {
-    fix = 2;
-  };
+  // if (!history) {
+
+  // } else if (new Date(history[0].date) > newDate) {
+  //   fix = 1;
+  // } else if (new Date(history[0].date) < oldDate) {
+  //   fix = 2;
+  // };
+
+  var history;
+
+  if (row.history) {
+    history = JSON.parse(row.history);
+    if (new Date(history[0].date) > newDate) {
+      fix = 1;
+    } else if (new Date(history[0].date) < oldDate) {
+      fix = 2;
+    };
+  }
 
   return (
     <React.Fragment>
