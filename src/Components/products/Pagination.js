@@ -12,8 +12,8 @@ class Pagination extends Component {
 	state = {
 		search: '',
 		sortBy: 'name',
-		sort: 'asc',
-		limit: '15',
+		sort: 'desc',
+		limit: '100',
 		page: '1',
 		openScanner: false,
 	}
@@ -50,8 +50,21 @@ class Pagination extends Component {
 		setTimeout(() => this.props.callBack(this.state), 250);
 	}
 	render() {
-		console.log(this);
-		console.log(this.props);
+		var asc = "ASC";
+		var desc = "DESC";
+		if (this.state.sortBy === "date") {
+			asc = "Äldsta";
+			desc = "Senaste";
+		} else if (this.state.sortBy === "name") {
+			asc = "Första";
+			desc = "Sista";
+		} else if (this.state.sortBy === "unit") {
+			asc = "Första";
+			desc = "Sista";
+		} else if (this.state.sortBy === "quantity") {
+			asc = "Minst";
+			desc = "Mest";
+		}
 		return (
 			this.state.openScanner ?
 				<Scanner change={this.editCode} value={""} close={this.changeScanner} />
@@ -68,6 +81,7 @@ class Pagination extends Component {
 					<GridItem xs={4} sm={4} md={2}>
 						<select defaultValue="Sortera" className="form-control" name="sortBy" onChange={this.handlerChange}>
 							<option disabled>Sortera</option>
+							<option value="date">Datum</option>
 							<option value="name">Namn</option>
 							<option value="unit">Enhet</option>
 							<option value="quantity">Antal</option>
@@ -75,8 +89,8 @@ class Pagination extends Component {
 					</GridItem>
 					<GridItem xs={4} sm={4} md={2}>
 						<select defaultValue="ASC" className="form-control" name="sort" onChange={this.handlerChange}>
-							<option value="asc">Upp</option>
-							<option value="desc">Ner</option>
+							<option value="asc">{asc}</option>
+							<option value="desc">{desc}</option>
 						</select>
 					</GridItem>
 					{/* <GridItem xs={4} sm={3} md={2}>

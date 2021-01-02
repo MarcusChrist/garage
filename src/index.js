@@ -12,6 +12,7 @@ import EditProduct from './Components/products/EditProduct';
 import Login from './Components/users/Login';
 import Signup from './Components/users/Signup';
 import GetSearching from './Components/products/GetSearching';
+import Lists from './Components/lists/index';
 
 ReactDOM.render(
     <Router>
@@ -24,6 +25,7 @@ ReactDOM.render(
     <Route exact path="/products/:id" component= {(props)=>{ return <SingleProducts {...props}/>}} />
     <Route exact path="/products/edit/:id" component= {(props)=>{ return <EditProduct {...props}/>}} />
     <Route exact path="/getsearching/:name" component= {(props)=>{ return <GetSearching {...props}/>}}/>
+    <Route exact path="/lists" component= {(props)=>{ return <Lists {...props}/>}}/>
   
     </Switch>
     </Router>

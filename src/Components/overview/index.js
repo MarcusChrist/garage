@@ -63,10 +63,10 @@ function Row(props) {
           <Link to={'/products/edit/' + row.id}> {row.name}</Link>
         </TableCell>
         <TableCell align="left">
-          {row.quantity + "/" + row.unit}
+          {row.quantity ? row.quantity : "? " }/{row.unit ? row.unit : " ?"}
         </TableCell>
         {/* <TableCell align="right">{row.unit}</TableCell> */}
-        <TableCell align="left">{history ? history[0].date : ""}</TableCell>
+        <TableCell align="left">{history ? history[0].date : "Ej inventerad"}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -124,8 +124,8 @@ Row.propTypes = {
     //   }),
     // ).isRequired,
     name: PropTypes.string.isRequired,
-    quantity: PropTypes.number.isRequired,
-    unit: PropTypes.string.isRequired,
+    quantity: PropTypes.number,
+    unit: PropTypes.string,
   }).isRequired,
 };
 

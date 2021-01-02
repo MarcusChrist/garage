@@ -19,9 +19,9 @@ class Products extends Component {
 		totals: 0,
 		query: {
 			search: '%%',
-			sortBy: 'name',
-			sort: 'asc',
-			limit: '6',
+			sortBy: 'id',
+			sort: 'desc',
+			limit: '100',
 			page: '1'
 		},
 
@@ -33,7 +33,9 @@ class Products extends Component {
 		const { search, sortBy, sort, limit, page } = this.state.query;
 		axios.get(`/products?search=${search}&sortBy=${sortBy}&sort=${sort}&limit=${limit}&page=${page}`)
 			.then(res => {
-				setTimeout(() => this.setState({ items: res.data.data, totals: res.data.total.total, isLoading: false }), 500);
+				console.log(res.data.data);
+				if (res.data.data)
+					setTimeout(() => this.setState({ items: res.data.data, totals: res.data.total.total, isLoading: false }), 500);
 			})
 			.catch(err => console.log(err))
 	}

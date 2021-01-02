@@ -4,6 +4,10 @@ import { Link, Redirect } from 'react-router-dom'
 import axios from 'axios';
 import { Scanner } from '../../functions/Scanner';
 import { WebUrl } from '../../api/config';
+import GridItem from '../../functions/GridItem';
+import GridContainer from '../../functions/GridContainer';
+import { Grid, TextField, Typography } from "@material-ui/core";
+
 class CreateProduct extends Component {
 
     constructor(props) {
@@ -135,59 +139,77 @@ class CreateProduct extends Component {
         }
         return (
             <div style={{ height: '800px' }} className='beckground'>
-                <Container >
-                    {this.state.openScanner ?
-                        <Scanner change={this.editCode} value={this.state.code} close={this.changeScanner} />
-                        :
-                        <Row>
-                            <Col style={{ backgroundColor: '#f5f8fa' }}>
-                                <br />
-                                <Form onSubmit={this.onSubmit}>
-                                    <h1>Skapa Produkt</h1>
-                                    <Form.Group >
-                                        <Form.Label>Produkt Namn</Form.Label>
-                                        <Form.Control name="name" value={this.state.name} placeholder="Namn på produkten" onChange={this.onChangeName} required />
-                                    </Form.Group>
-                                    <Form.Group >
-                                        <Form.Label>Beskrivning</Form.Label>
-                                        <Form.Control name="info" value={this.state.info} placeholder="Beskrivning av produkten" onChange={this.onChangeDescription} />
-                                    </Form.Group>
-                                    <Form.Group >
-                                        <Form.Label>Scankod</Form.Label>
-                                        <Form.Control name="code" value={this.state.code} placeholder="Tryck för att skanna in kod" onClick={this.changeScanner} onChange={this.onChangeImage} />
-                                    </Form.Group>
-                                    <Form.Group >
-                                        <Form.Label >Välj Enhet</Form.Label>
-                                        <Form.Control as="select" name="unit" onChange={this.onChangeCategory} required>
-                                            <option selected>-- Välj Enhet --</option>
-                                            {this.state.categori.map(item => {
-                                                return <option value={item.unit} key={item.id}>{item.unit}</option>
-                                            })
-                                            }
-                                            {/* <Form.Label>Category</Form.Label>
-                                        <Form.Control as="select" name="category" onChange={this.onChangeCategory} required>
-                                        <option selected>-- Select category --</option>
-                                        {this.state.categori.map(item => 
-                                        <option value={item.id}  key={item.id}>{item.category}</option>
-                                        )} */}
-                                        </Form.Control>
+                <GridContainer>
+                    <GridItem xs={12} sm={12} md={12}>
+                        {this.state.openScanner ?
+                            <Scanner change={this.editCode} value={this.state.code} close={this.changeScanner} />
+                            :
+                            // <Row>
+                            <>
+                                <Col style={{ backgroundColor: '#f5f8fa' }}>
+                                    <br />
+                                    <Form onSubmit={this.onSubmit}>
+                                        <h1>Skapa Produkt</h1>
+                                        <Form.Group >
+                                            <Form.Label>Produkt Namn</Form.Label>
+                                            <Form.Control name="name" value={this.state.name} placeholder="Namn på produkten" onChange={this.onChangeName} required />
+                                        </Form.Group>
+                                        <TextField
+                                            id="outlined-multiline-static"
+                                            label="Beskrivning"
+                                            name="info"
+                                            multiline
+                                            rows={6}
+                                            style={{ width: "100%" }}
+                                            variant="outlined"
+                                            value={this.state.info}
+                                            onChange={this.onChangeDescription}
+                                            placeholder="Beskrivning av produkten"
+                                        />
+                                        <Form.Group >
+                                            <Form.Label>Scankod</Form.Label>
+                                            <Form.Control name="code" value={this.state.code} placeholder="Tryck för att skanna in kod" onClick={this.changeScanner} onChange={this.onChangeImage} />
+                                        </Form.Group>
 
-                                    </Form.Group>
-                                    <Form.Group >
-                                        <Form.Label>Antal</Form.Label>
-                                        <Form.Control name="quantity" value={this.state.quantity} placeholder="Skriv in inventerat antal" onChange={this.onChangeQuantity} required />
-                                    </Form.Group>
-                                    <Button variant="primary" type="submit">
-                                        Skapa
-                                    </Button>
-                                </Form>
-                                <br />
-                                <Link to='/'>Tillbaka</Link>
-                            </Col>
-                            <Col ></Col>
-                        </Row>
-                    }
-                </Container>
+                                        <GridContainer>
+                                            <GridItem xs={6} sm={6} md={6}>
+                                                <Form.Group >
+                                                    <Form.Label>Antal</Form.Label>
+                                                    <Form.Control name="quantity" value={this.state.quantity} placeholder="Skriv in inventerat antal" onChange={this.onChangeQuantity} />
+                                                </Form.Group>
+                                            </GridItem>
+                                            <GridItem xs={6} sm={6} md={6}>
+                                                <Form.Group >
+                                                    <Form.Label >Välj Enhet</Form.Label>
+                                                    <Form.Control as="select" name="unit" onChange={this.onChangeCategory} required>
+                                                        <option selected>-- Välj Enhet --</option>
+                                                        {this.state.categori.map(item => {
+                                                            return <option value={item.unit} key={item.id}>{item.unit}</option>
+                                                        })
+                                                        }
+                                                    </Form.Control>
+                                                </Form.Group>
+                                            </GridItem>
+                                        </GridContainer>
+                                        <Grid container direction="row" justify="space-between">
+                                            <Button variant="primary" type="submit">
+                                                Skapa
+                                            </Button>
+                                            <Link to='/'>
+                                                <Button variant="primary">
+                                                    Tillbaka
+                                                </Button>
+                                            </Link>
+                                        </Grid>
+                                    </Form>
+                                    <br />
+                                </Col>
+                                <Col ></Col>
+                            </>
+                            // </Row>
+                        }
+                    </GridItem>
+                </GridContainer>
             </div>
         )
     }

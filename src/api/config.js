@@ -1,9 +1,12 @@
 
 
 //Development
-export const WebUrl = "http://localhost:8080";
-export const NonAuthUrl = "https://fde993e9a481.ngrok.io/api/v1/";
+//export const WebUrl = "http://localhost:8080";
 
-//Production
-//export const WebUrl = "https://mbprojekt.github.io/";
-//export const NonAuthUrl = "https://inventory.herokuapp.com/api/v1/";
+//test
+//export const WebUrl = "https://fa5b3077666d.ngrok.io";
+
+//prod
+export const WebUrl = "https://inventories.herokuapp.com";
+//export const WebUrl = "https://uppsalavm.github.io/";
+
