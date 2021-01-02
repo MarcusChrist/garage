@@ -6,9 +6,7 @@ export default class AuthService {
     
     // Initializing important variables
     constructor(domain) {
-        console.log(domain);
         this.domain = domain || WebUrl + '/user' // API server domain
-        console.log(this.domain);
         //this.fetch = this.fetch.bind(this) // React binding stuff
         //this.login = this.login.bind(this)
         //this.getProfile = this.getProfile.bind(this)
@@ -23,6 +21,7 @@ export default class AuthService {
                 password
             })
         }).then(res => {
+            console.log(res);
             if (res.status === 400) {
                 console.log("login failed")
                 return Promise.reject(res);
