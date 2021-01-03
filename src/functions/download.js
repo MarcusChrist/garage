@@ -10,7 +10,7 @@ class Download extends React.Component {
         console.log(this.props);
         console.log(this.props.data);
         return (
-            <ExcelFile element={<button ref={this.props.hiddenCreateFile} style={{ display: 'none' }} ></button>}>
+            <ExcelFile element={<button  >Ladda ner</button>}>
                 <ExcelSheet data={this.props.data} name="Inventeringslista">
                     <ExcelColumn label="Namn" value="name"/>
                     <ExcelColumn label="Inventerad" value={"history"}/>

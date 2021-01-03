@@ -44,7 +44,9 @@ class EditProduct extends Component {
             .then(res => {
                 for (var key in res.data.data[0]) {
                     if (key === 'history') {
-                        this.setState({ [key]: JSON.parse(res.data.data[0][key]) });
+                        if (res.data.data[0][key] !== "") {
+                            this.setState({ [key]: JSON.parse(res.data.data[0][key]) });
+                        }
                     } else {
                         this.setState({ [key]: res.data.data[0][key] });
                     }
@@ -76,6 +78,7 @@ class EditProduct extends Component {
                 if (res.data.data) {
                     console.log(res.data.data);
                     console.log("Hittad artikel!");
+                    if (res.data.data[0]['id'] === this.state.id) return;
                     if (this.state.autoOpened) {
                         this.props.history.replace('/products/edit/' + res.data.data[0]['id']);
                         for (var key in res.data.data[0]) {
@@ -87,7 +90,7 @@ class EditProduct extends Component {
                         }
                         this.setState({ ['counted']: res.data.data[0]['quantity'] });
                     } else {
-                        const answer = window.confirm("Denna streckkod används redan.\mVill du ta fram den hittade produkten istället?");
+                        const answer = window.confirm("Denna streckkod används redan.\nVill du ta fram den hittade produkten istället?");
                         if (answer) {
                             this.props.history.replace('/products/edit/' + res.data.data[0]['id']);
                         }
@@ -162,7 +165,7 @@ class EditProduct extends Component {
         setTimeout(() => {
             if (this.state.addUp) {
                 this.setState({ counted: Number(this.state.counted + 1) });
-                i -= 25;
+                i -= 12;
                 this.doSetTimeout(i);
             }
         }, i);

@@ -12,6 +12,7 @@ export class Scanner extends Component {
             result: '',
             isOnline: true,
             face: false,
+            isQr: true,
         };
 
         this.handleScan = this.handleScan.bind(this);
@@ -23,17 +24,10 @@ export class Scanner extends Component {
 
     handleScan(data) {
         if (data) {
-            this.setState({
-                result: data
-            })
+            console.log(data);
+            this.props.change(data);
+            this.beep();
         }
-        // this.setState({
-        //     result: data,
-        // });
-        // if (data !== null) {
-        //     beep();
-        //     this.props.change(data);
-        // }
     }
 
     handleError(err) {
@@ -61,13 +55,29 @@ export class Scanner extends Component {
         return (
 
             <div>
-                <QrReader
-                    delay={300}
-                    onError={this.handleError}
-                    onScan={this.handleScan}
-                    style={{ width: '100%' }}
-                    facingMode={this.state.face ? "user" : "environment"}
-                />
+                {this.state.isOnline ? <>
+                    {this.state.isQr ?
+                        <QrReader
+                            delay={300}
+                            onError={this.handleError}
+                            onScan={this.handleScan}
+                            style={{ width: '100%', height: "80%" }}
+                            facingMode={this.state.face ? "user" : "environment"}
+                        />
+                        :
+                        <BarcodeScannerComponent
+                            width={"100%"}
+                            height={"80%"}
+                            onUpdate={(err, result) => {
+                                if (this.state.isOnline && result) {
+                                    console.log(result.text);
+                                    this.handleScan(result.text);
+                                }
+                            }}
+                            facingMode={this.state.face ? "front" : "rear"}
+                        />
+                    }
+                </> : ""}
                 <Grid container justify="space-between" direction="row">
                     {/* {this.props.value ? this.props.value : "Scanna kod"} */}
                     <Button color="primary" fontSize="large" onClick={this.props.close}>
@@ -78,8 +88,11 @@ export class Scanner extends Component {
                             Avsluta
                     </Button>
                         : ""}
+                    <Button color="primary" fontSize="large" onClick={val => { this.setState({ isQr: !this.state.isQr }) } }>
+                        {this.state.isQr ? "Streckkod" : "QR-kod"}
+                    </Button>
                     <Button color="primary" fontSize="large" onClick={this.changeCamera}>
-                        {this.state.face ? "Kamera Bak" : "Kamera Fram"}
+                        Byt Kamera
                     </Button>
                 </Grid>
             </div>
@@ -94,22 +107,6 @@ export class Scanner extends Component {
             //             //facingMode={"rear"}
             //             />
 
-            //             <BarcodeScannerComponent
-            //             width={"0px"} //% KAN BEHÖVAS BLI STÖRRE ELLER MINDRE, kolla vad som funkar
-            //             height={"0px"}
-            //             onUpdate={(err, result) => {
-            //                 if (this.state.isOnline) {
-            //                     if (result) {
-            //                         beep();
-            //                         this.props.change(result.text);
-            //                     } else {
-            //                         this.setState({
-            //                             result: '',
-            //                         });
-            //                     }
-            //                 }
-            //             }}
-            //             />
             //             <Grid container justify="space-between" direction="row">
             //                 {/* {this.props.value ? this.props.value : "Scanna kod"} */}
             //                 <Button color="primary" fontSize="large" onClick={this.props.close}>

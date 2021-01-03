@@ -54,7 +54,7 @@ function Row(props) {
 
   var history;
 
-  if (row.history) {
+  if (row.history !== "" && row.history !== null) {
     history = JSON.parse(row.history);
     if (new Date(history[0].date) > newDate) {
       fix = 1;
@@ -143,7 +143,6 @@ Row.propTypes = {
 
 export default function ProductsTable(props) {
   const { items } = props;
-  console.log(items);
   var newDate = new Date();
   var oldDate = new Date();
   newDate.setDate(newDate.getDate() - 30);

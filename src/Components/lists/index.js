@@ -25,21 +25,36 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import Download from '../../functions/download';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from "@material-ui/core/InputLabel";
+import TextField from "@material-ui/core/TextField";
+
+
+const catChoices = [
+    "Lägg till",
+    "Ta bort",
+    "Ändra",
+]
+const defaultState = {
+    showTable: false,
+    importTable: false,
+    units: [],
+    totals: 0,
+    catChoice: catChoices[0],
+    catChosen: "",
+    catName: "",
+}
 
 class Lists extends Component {
-    state = {
-        showTable: false,
-        units: [],
-        totals: 0,
-        export: false,
-    }
+    state = defaultState;
 
     hiddenGetFile = React.createRef();
     hiddenCreateFile = React.createRef();
 
     componentDidMount() {
-        axios.get('/categories')
-            .then(response => this.setState({ units: response.data.data }))
+        this.refreshPage();
     }
 
     getFile = () => {
@@ -49,7 +64,7 @@ class Lists extends Component {
     handleGetFile = e => {
         e.preventDefault();
         readXlsxFile(e.target.files[0]).then((rows) => {
-            this.setState({ showTable: rows, totals: rows.length });
+            this.setState({ importTable: rows, totals: rows.length });
         });
     }
 
@@ -58,21 +73,29 @@ class Lists extends Component {
         temp.splice(index, 1);
         this.setState({ showTable: temp });
     }
+    deleteImportRow = index => e => {
+        var temp = this.state.importTable;
+        temp.splice(index, 1);
+        this.setState({ importTable: temp });
+    }
 
+    createLists = () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            this.hiddenCreateFile.current.click();
+        };
+    }
     createProducts = () => {
         const token = localStorage.getItem('token')
         const answer = window.confirm("Har du förhandsgranskat listan och allt ser okej ut?\nTryck annars avbryt.");
         if (answer && token) {
-            this.hiddenCreateFile.current.click();
-            //this.setState({ download: true})
-        } else {
-            for (var i = 0; i < this.state.showTable.length; i++) {
+            for (var i = 0; i < this.state.importTable.length; i++) {
                 const newTodo = {
-                    name: this.state.showTable[i][0],
-                    code: this.state.showTable[i][1],
-                    quantity: this.state.showTable[i][2],
-                    unit: this.state.showTable[i][3],
-                    info: this.state.showTable[i][4],
+                    name: this.state.importTable[i][0],
+                    code: this.state.importTable[i][1],
+                    quantity: this.state.importTable[i][2],
+                    unit: this.state.importTable[i][3],
+                    info: this.state.importTable[i][4],
                 }
                 axios.post('/products', newTodo, { headers: { authorization: token } })
                     .then((response) => {
@@ -105,135 +128,273 @@ class Lists extends Component {
                 for (var i = 0; i < temp.length; i++) {
                     temp[i].history = temp[i].history ? temp[i].history.substr(10, 19) : "Ej inventerad";
                 }
-                setTimeout(() => this.setState({ showTable: temp, totals: temp.length, export: true }), 500);
+                setTimeout(() => this.setState({ showTable: temp, totals: temp.length }), 500);
             })
             .catch(err => console.log(err));
 
     }
 
+    catStart = () => {
+        const token = localStorage.getItem('token');
+
+        if (this.state.catChoice === "Lägg till" && this.state.catName !== "") {
+            axios.post('/categories', { unit: this.state.catName }, { headers: { authorization: token } })
+                .then((response) => {
+                    this.refreshPage();
+                    console.log(response);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+
+        } else if (this.state.catChoice === "Ta bort") {
+            //%% Gör även en update på alla som har denna enhet
+            axios.delete('/categories/' + this.state.catChosen.id, { headers: { authorization: token } })
+                .then((response) => {
+                    this.refreshPage();
+                    console.log(response);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+
+        } else if (this.state.catChoice === "Ändra") {
+            axios.patch('/categories/' + this.state.catChosen.id, { unit: this.state.catName }, { headers: { authorization: token } })
+                .then((response) => {
+                    this.refreshPage();
+                    console.log(response);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+            //Ändra alla i en kategori till en annan som redan finns och ta bort den gamla kategorin
+        }
+    }
+
+    refreshPage = () => {
+        this.setState(defaultState);
+
+        axios.get('/categories')
+            .then(response => this.setState({ units: response.data.data }))
+    }
+
     render() {
-        console.log(this.state.showTable);
         return (
-            <div style={{ padding: "10px" }}>
-                <GridContainer>
-                    <GridItem xs={12} sm={12} md={12}>
-                        <Card>
-                            <CardBody>
-                                <GridContainer direction="row">
-                                    <GridItem xs={12} sm={12} md={12}>
-                                        <Grid container direction="row" justify="space-between">
-                                            <Button variant="primary" onClick={this.createProducts} disabled={this.state.showTable ? false : true}>
-                                                Skapa
-                                            </Button>
-                                            <Link to='/'>
-                                                <Button variant="primary">
-                                                    Tillbaka
+            <div style={{ margin: "10px" }}>
+                <Card>
+                    <CardBody>
+                        <GridContainer direction="row">
+                            <GridItem xs={12} sm={12} md={12}>
+                                <Grid container direction="row-reverse" justify="space-between">
+                                    <Link to='/'>
+                                        <Button variant="primary">
+                                            Tillbaka
                                                 </Button>
-                                            </Link>
-                                        </Grid>
-                                        <div style={{ marginBottom: "20px" }}></div>
-                                    </GridItem>
-                                    <GridItem xs={12} sm={6} md={6}>
-                                        <IconButton color="primary" aria-label="readMany" size="medium" onClick={this.getFile}>
-                                            <input type="file" style={{ display: 'none' }} ref={this.hiddenGetFile} onChange={this.handleGetFile} />
-                                            <CloudDownloadIcon style={{ marginRight: "10px" }} />
-                                            <Typography>IMPORTERA</Typography>
-                                        </IconButton>
+                                    </Link>
+                                </Grid>
+                                <div style={{ marginBottom: "20px" }}></div>
+                            </GridItem>
+                        </GridContainer>
+                        <Accordion>
+                            <AccordionSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls="panel1a-content"
+                                id="panel1a-header"
+                            >
+                                <Typography>IMPORTERA</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <GridContainer>
+                                    <GridItem xs={12} sm={12} md={12}>
+                                        {this.state.importTable ?
+                                            <Button variant="primary" onClick={this.createProducts} disabled={this.state.importTable ? false : true}>
+                                                IMPORTERA
+                                                    </Button> :
+                                            <IconButton color="primary" aria-label="readMany" size="medium" onClick={this.getFile}>
+                                                <input type="file" style={{ display: 'none' }} ref={this.hiddenGetFile} onChange={this.handleGetFile} />
+                                                <CloudDownloadIcon style={{ marginRight: "10px" }} />
+                                                <Typography>VÄLJ EXCEL FIL</Typography>
+                                            </IconButton>
+                                        }
                                         <Typography>Skapa produkter från en excelfil. Varje rad blir en ny produkt med:</Typography>
                                         <Typography>Kolumn A = Namn, Kolumn B = Scankod, Kolumn C = Antal (lämna tom om inget antal är inventerat), Kolumn D = Enhet, Kolumn E = Beskrivning.</Typography>
                                         <div style={{ marginBottom: "20px" }}></div>
                                     </GridItem>
-                                    <GridItem xs={12} sm={6} md={6}>
-                                        <IconButton color="primary" aria-label="readMany" size="medium" onClick={this.createFile}>
-                                                <Download data={this.state.showTable} hiddenCreateFile={this.hiddenCreateFile}/>
-                                            <BackupIcon style={{ marginRight: "10px" }} />
-                                            <Typography>EXPORTERA</Typography>
-                                        </IconButton>
+                                    <GridItem xs={12} sm={12} md={12}>
+                                        <Table style={{ width: "100%" }} aria-label="import">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell>Rad</TableCell>
+                                                    <TableCell>Namn</TableCell>
+                                                    <TableCell>Scankod</TableCell>
+                                                    <TableCell>Antal</TableCell>
+                                                    <TableCell>Enhet</TableCell>
+                                                    <TableCell>Beskrivning</TableCell>
+                                                    <TableCell align="right">Ta Bort</TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {this.state.importTable ? this.state.importTable.map((row, index) => (
+                                                    <TableRow key={index}>
+                                                        <TableCell component="th" scope="row">{index + 1}</TableCell>
+                                                        <TableCell>{row[0]}</TableCell>
+                                                        <TableCell>{row[1]}</TableCell>
+                                                        <TableCell>{row[2]}</TableCell>
+                                                        <TableCell style={this.state.units.find(element => element.unit === row[3]) ? null : { backgroundColor: "red" }}>{row[3]}</TableCell>
+                                                        <TableCell>{row[4]}</TableCell>
+                                                        <TableCell align="right">
+                                                            <IconButton color="primary" aria-label="readMany" size="medium" onClick={this.deleteImportRow(index)}>
+                                                                <DeleteForeverIcon />
+                                                            </IconButton>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )) : <></>}
+                                            </TableBody>
+                                        </Table>
+                                    </GridItem>
+                                </GridContainer>
+                            </AccordionDetails>
+                        </Accordion>
+                        <Accordion>
+                            <AccordionSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls="panel1b-content"
+                                id="panel1b-header"
+                            >
+                                <Typography>EXPORTERA</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <GridContainer>
+                                    <GridItem xs={12} sm={12} md={12}>
+                                        {!this.state.showTable ?
+                                            <IconButton color="primary" aria-label="readMany" size="medium" onClick={this.createFile}>
+                                                <BackupIcon style={{ marginRight: "10px" }} />
+                                                <Typography>SKAPA EXPORTFIL</Typography>
+                                            </IconButton>
+                                            // <Button variant="primary" onClick={this.createFile}>
+                                            //     FÖRHANDSGRANSKA
+                                            //     </Button>
+                                            :
+                                            <Download data={this.state.showTable} hiddenCreateFile={this.hiddenCreateFile} />
+                                        }
                                         <Typography>Sparar ner information om produkterna i en excelfil.</Typography>
                                         {/* <Typography>Välj vilka produkter som ska presenteras.</Typography> */}
                                         <div style={{ marginBottom: "20px" }}></div>
                                     </GridItem>
+                                    <GridItem xs={12} sm={12} md={12}>
+                                        <Table style={{ width: "100%" }} aria-label="export">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell>Rad</TableCell>
+                                                    <TableCell>Namn</TableCell>
+                                                    <TableCell>Inventerad</TableCell>
+                                                    <TableCell>Antal</TableCell>
+                                                    <TableCell>Enhet</TableCell>
+                                                    <TableCell>Beskrivning</TableCell>
+                                                    <TableCell align="right">Ta Bort</TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {this.state.showTable ? this.state.showTable.map((row, index) => (
+                                                    <TableRow key={index}>
+                                                        <TableCell component="th" scope="row">{index + 1}</TableCell>
+                                                        <TableCell>{row.name}</TableCell>
+                                                        <TableCell>{row.history}</TableCell>
+                                                        <TableCell>{row.quantity}</TableCell>
+                                                        <TableCell>{row.unit}</TableCell>
+                                                        <TableCell>{row.info}</TableCell>
+                                                        <TableCell align="right">
+                                                            <IconButton color="primary" aria-label="readMany" size="medium" onClick={this.deleteRow(index)}>
+                                                                <DeleteForeverIcon />
+                                                            </IconButton>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )) : <></>}
+                                            </TableBody>
+                                        </Table>
+                                    </GridItem>
                                 </GridContainer>
-                                <Accordion disabled={this.state.showTable ? false : true} expanded={this.state.showTable ? true : false}>
-                                    <AccordionSummary
-                                        expandIcon={<ExpandMoreIcon />}
-                                        aria-controls="panel3a-content"
-                                        id="panel3a-header"
-                                    >
-                                        <Typography>{"Förhandsgranskning av " + this.state.totals + " produkter."}</Typography>
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-                                        <Typography>
-                                            {this.state.showTable && this.state.export ?
-                                                <Table size="small" aria-label="purchases">
-                                                    <TableHead>
-                                                        <TableRow>
-                                                            <TableCell>Rad</TableCell>
-                                                            <TableCell>Namn</TableCell>
-                                                            <TableCell>Inventerad</TableCell>
-                                                            <TableCell>Antal</TableCell>
-                                                            <TableCell>Enhet</TableCell>
-                                                            <TableCell>Beskrivning</TableCell>
-                                                            <TableCell align="right">Ta Bort</TableCell>
-                                                        </TableRow>
-                                                    </TableHead>
-                                                    <TableBody>
-                                                        {this.state.showTable.map((row, index) => (
-                                                            <TableRow key={index}>
-                                                                <TableCell component="th" scope="row">{index + 1}</TableCell>
-                                                                <TableCell>{row.name}</TableCell>
-                                                                <TableCell>{row.history}</TableCell>
-                                                                <TableCell>{row.quantity}</TableCell>
-                                                                <TableCell>{row.unit}</TableCell>
-                                                                <TableCell>{row.info}</TableCell>
-                                                                <TableCell align="right">
-                                                                    <IconButton color="primary" aria-label="readMany" size="medium" onClick={this.deleteRow(index)}>
-                                                                        <DeleteForeverIcon />
-                                                                    </IconButton>
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        ))}
-                                                    </TableBody>
-                                                </Table>
-                                                : this.state.showTable ?
-                                                    <Table size="small" aria-label="purchases">
-                                                        <TableHead>
-                                                            <TableRow>
-                                                                <TableCell>Rad</TableCell>
-                                                                <TableCell>Namn</TableCell>
-                                                                <TableCell>Scankod</TableCell>
-                                                                <TableCell>Antal</TableCell>
-                                                                <TableCell>Enhet</TableCell>
-                                                                <TableCell>Beskrivning</TableCell>
-                                                                <TableCell align="right">Ta Bort</TableCell>
-                                                            </TableRow>
-                                                        </TableHead>
-                                                        <TableBody>
-                                                            {this.state.showTable.map((row, index) => (
-                                                                <TableRow key={index}>
-                                                                    <TableCell component="th" scope="row">{index + 1}</TableCell>
-                                                                    <TableCell>{row[0]}</TableCell>
-                                                                    <TableCell>{row[1]}</TableCell>
-                                                                    <TableCell>{row[2]}</TableCell>
-                                                                    <TableCell style={this.state.units.find(element => element.unit === row[3]) ? null : { backgroundColor: "red" }}>{row[3]}</TableCell>
-                                                                    <TableCell>{row[4]}</TableCell>
-                                                                    <TableCell align="right">
-                                                                        <IconButton color="primary" aria-label="readMany" size="medium" onClick={this.deleteRow(index)}>
-                                                                            <DeleteForeverIcon />
-                                                                        </IconButton>
-                                                                    </TableCell>
-                                                                </TableRow>
-                                                            ))}
-                                                        </TableBody>
-                                                    </Table>
-                                                    : ""}
-                                        </Typography>
-                                    </AccordionDetails>
-                                </Accordion>
-                            </CardBody>
-                        </Card>
-                    </GridItem>
-                </GridContainer>
+                            </AccordionDetails>
+                        </Accordion>
+                        <Accordion>
+                            <AccordionSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls="panel1c-content"
+                                id="panel1c-header"
+                            >
+                                <Typography>KATEGORIER</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <GridContainer style={{ width: "100%" }}>
+                                    <GridItem xs={12} sm={4} md={2}>
+                                        <FormControl style={{ width: "100%" }}>
+                                            <InputLabel id="mittNamn2">Händelse</InputLabel>
+                                            <Select
+                                                labelId="mittNamn2"
+                                                id="mittNamn"
+                                                value={this.state.catChoice}
+                                                onChange={val => this.setState({ catChoice: val.target.value })}
+                                            >
+                                                {catChoices.map(item => {
+                                                    return <MenuItem value={item} key={item}>{item}</MenuItem>
+                                                })}
+                                            </Select>
+                                        </FormControl>
+                                    </GridItem>
+                                    {this.state.catChoice === "Ändra" ?
+                                        <GridItem xs={12} sm={3} md={2}>
+                                            <FormControl style={{ width: "100%" }}>
+                                                <InputLabel id="foundcat3a">Enhet</InputLabel>
+                                                <Select
+                                                    labelId="foundcata"
+                                                    id="foundcat1a"
+                                                    value={this.state.catChosen}
+                                                    onChange={val => this.setState({ catChosen: val.target.value })}
+                                                >
+                                                    {this.state.units.map(item => {
+                                                        return <MenuItem value={item} key={item.id}>{item.unit}</MenuItem>
+                                                    })}
+                                                </Select>
+                                            </FormControl>
+                                        </GridItem>
+                                        : <></>}
+                                    <GridItem xs={10} sm={3} md={2}>
+                                        {this.state.catChoice === "Lägg till" || this.state.catChoice === "Ändra" ?
+                                            <TextField
+                                                label="Nytt Namn"
+                                                id="kommantarer"
+                                                value={this.state.catName ? this.state.catName : ""}
+                                                style={{ width: "100%" }}
+                                                onChange={val => { this.setState({ ['catName']: val.target.value }); }}
+                                            />
+                                            : <></>}
+                                        {this.state.catChoice === "Ta bort" ?
+                                            <FormControl style={{ width: "100%" }}>
+                                                <InputLabel id="foundcat3">Enhet</InputLabel>
+                                                <Select
+                                                    labelId="foundcat2"
+                                                    id="foundcat1"
+                                                    value={this.state.catChosen}
+                                                    onChange={val => this.setState({ catChosen: val.target.value })}
+                                                >
+                                                    {this.state.units.map(item => {
+                                                        return <MenuItem value={item} key={item.id}>{item.unit}</MenuItem>
+                                                    })}
+                                                </Select>
+                                            </FormControl>
+                                            : <></>}
+                                    </GridItem>
+                                    <GridItem xs={2} sm={2} md={1}>
+                                        <Button variant="primary" onClick={this.catStart} style={{ marginTop: "12px" }}>
+                                            OK
+                                                 </Button>
+                                    </GridItem>
+                                </GridContainer>
+                                <div style={{ marginBottom: "20px" }}></div>
+                            </AccordionDetails>
+                        </Accordion>
+                    </CardBody>
+                </Card>
             </div>
         );
     }

@@ -31,7 +31,7 @@ class App extends Component {
                 <Nav className="mr-auto">
                 <Nav.Link><Link to='/'>Hem</Link></Nav.Link>
                 <Nav.Link><Link to='/add'>Ny Produkt</Link></Nav.Link>
-                <Nav.Link><Link to='/lists'>Import/Export</Link></Nav.Link>
+                <Nav.Link><Link to='/lists'>Administration</Link></Nav.Link>
                 </Nav>
                 <Button variant="danger" type="submit" onClick={this._handleLogout}>
                   Logout
