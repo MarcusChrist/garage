@@ -1,7 +1,7 @@
 {
   "homepage": "https://uppsalavm.github.io",
   "name": "warehouse",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": false,
   "dependencies": {
     "@material-ui/core": "^4.11.2",
