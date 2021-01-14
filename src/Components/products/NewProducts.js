@@ -31,7 +31,8 @@ class Products extends Component {
 
 	componentDidMount() {
 		const { search, sortBy, sort, limit, page } = this.state.query;
-		axios.get(`/products?search=${search}&sortBy=${sortBy}&sort=${sort}&limit=${limit}&page=${page}`)
+        const token = localStorage.getItem('token');
+		axios.get(`/products?search=${search}&sortBy=${sortBy}&sort=${sort}&limit=${limit}&page=${page}`, { headers: { authorization: token } })
 			.then(res => {
 				console.log(res.data.data);
 				if (res.data.data)
@@ -53,7 +54,8 @@ class Products extends Component {
 		this.setState({ query: data })
 		const { search, sortBy, sort, limit, page } = this.state.query;
 		let url = `/products?search=${search}&sortBy=${sortBy}&sort=${sort}&limit=${limit}&page=${page}`;
-		axios.get(url)
+        const token = localStorage.getItem('token')
+		axios.get(url, { headers: { authorization: token } })
 			.then(res => this.setState({ items: res.data.data, isLoading: false }))
 			.catch(err => console.log(err))
 	}

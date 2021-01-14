@@ -7,7 +7,8 @@ import {Link} from 'react-router-dom'
 // import SearchProducts from '../products/SearchProducts'
 // import GetProducts from '../products/GetProducts';
 import Products from '../products/NewProducts';
-import { WebUrl } from '../../api/config';
+import {WebUrl} from '../../api/config';
+import GridContainer from '../../functions/GridContainer';
 
 axios.defaults.baseURL = WebUrl;
 class App extends Component {
@@ -25,15 +26,14 @@ class App extends Component {
       return (
         <div>
           <Navbar bg="grey" expand="lg">
-            <Navbar.Brand href="/">Uppsala Veterinärmottagning</Navbar.Brand>
+            <Navbar.Brand href="/">{localStorage.getItem('company')}</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mr-auto">
-                <Nav.Link><Link to='/'>Hem</Link></Nav.Link>
-                <Nav.Link><Link to='/add'>Ny Produkt</Link></Nav.Link>
-                <Nav.Link><Link to='/lists'>Administration</Link></Nav.Link>
+                <Link style={{marginLeft: "10px", marginRight: "10px", marginBottom: "10px", marginTop: "10px"}} to='/add'>Lägg in produkter</Link>
+                <Link style={{marginLeft: "10px", marginRight: "10px", marginBottom: "10px", marginTop: "10px"}} to='/admin'>Administration</Link>
                 </Nav>
-                <Button variant="danger" type="submit" onClick={this._handleLogout}>
+                <Button style={{marginLeft: "10px", marginTop: "10px"}} variant="danger" type="submit" onClick={this._handleLogout}>
                   Logout
                 </Button>
             </Navbar.Collapse>

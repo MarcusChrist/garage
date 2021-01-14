@@ -40,7 +40,8 @@ export default class GetProducts extends Component {
 
     componentDidMount() {
         const {search, sortBy, sort, limit, page} =this.state.query
-        axios.get(WebUrl + `/products/?search=${search}&sortBy=${sortBy}&sort=${sort}&limit=${limit}&page=${page}`)
+        const token = localStorage.getItem('token')
+        axios.get(WebUrl + `/products/?search=${search}&sortBy=${sortBy}&sort=${sort}&limit=${limit}&page=${page}`, { headers: { authorization: token } })
         .then(res =>{
             this.setState({item: res.data.data})
         })
@@ -50,7 +51,8 @@ export default class GetProducts extends Component {
     queryString = (data) => {
         this.setState({query: data})
         const {search, sortBy, sort, limit, page} =this.state.query;
-        axios.get(WebUrl + `/products/?search=${search}&sortBy=${sortBy}&sort=${sort}&limit=${limit}&page=${page}`)
+        const token = localStorage.getItem('token')
+        axios.get(WebUrl + `/products/?search=${search}&sortBy=${sortBy}&sort=${sort}&limit=${limit}&page=${page}`, { headers: { authorization: token } })
         .then(res => this.setState({item: res.data.data, loading : true}))
         .catch(err => console.log(err))
     }

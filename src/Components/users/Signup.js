@@ -13,8 +13,9 @@ export default class Signup extends Component {
   state = {
     name: "",
     email: "",
-    username: "",
-    password: ""
+    password: "",
+    companyname: "",
+    companypassword: "",
   }
 
   _handleChange = (e) => {
@@ -24,7 +25,6 @@ export default class Signup extends Component {
         [e.target.name]: e.target.value
       }
     )
-    console.log(this.state);
   }
   handleFormSubmit = e => {
     e.preventDefault();
@@ -32,9 +32,10 @@ export default class Signup extends Component {
     //Add this part right here
     axios.post(WebUrl + '/user/register', {
       name: this.state.name,
-      username: this.state.username,
       email: this.state.email,
-      password: this.state.password
+      password: this.state.password,
+      companyname: this.state.companyname,
+      companypassword: this.state.companypassword
     })
       .then(data => {
         console.log(data);
@@ -78,15 +79,21 @@ export default class Signup extends Component {
                 </Form.Group>
                 <Form.Group>
                   <Form.Text>
-                    Användarnamn :
-                      </Form.Text>
-                  <Form.Control type="text" name="username" placeholder="Välj ditt användarnamn" onChange={this._handleChange} />
-                </Form.Group>
-                <Form.Group>
-                  <Form.Text>
                     Lösenord :
                       </Form.Text>
                   <Form.Control type="password" name="password" placeholder="Skriv ditt lösenord" onChange={this._handleChange} />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Text>
+                    Företagsnamn :
+                      </Form.Text>
+                  <Form.Control type="text" name="companyname" placeholder="Skriv ditt företagsnamn" onChange={this._handleChange} />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Text>
+                    Företagslösenord :
+                      </Form.Text>
+                  <Form.Control type="password" name="companypassword" placeholder="Skriv ditt företagslösenord" onChange={this._handleChange} />
                 </Form.Group>
 
                 <Button variant='primary' type='submit' onClick={this.handleFormSubmit}>

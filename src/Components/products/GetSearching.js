@@ -38,7 +38,8 @@ export default class GetSearching extends Component {
             url += `?search=${name}`
         }
         
-        axios.get(url)
+        const token = localStorage.getItem('token')
+        axios.get(url, { headers: { authorization: token } })
         .then(res =>{
             this.setState({item: res.data.data})
         })

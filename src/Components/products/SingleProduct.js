@@ -16,7 +16,7 @@ class SingleProducts extends Component {
     }
     componentWillMount() {
         const {id} = this.props.match.params;
-        axios.get(`/products/${id}`)
+        axios.get(`/products/${id}`, { headers: { authorization: token } })
         .then(res =>
         {
 

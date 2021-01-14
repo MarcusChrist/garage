@@ -8,7 +8,8 @@ export default class DetailProduct extends Component {
         }
     }
     componentDidMount(){
-        axios.get(`/products/${this.state.products.id_product}`)
+        const token = localStorage.getItem('token')
+        axios.get(`/products/${this.state.products.id_product}`, { headers: { authorization: token } })
         .then(response => this.setState({products: response.data.data }))
     }
     render(){

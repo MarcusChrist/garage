@@ -6,7 +6,8 @@ import { Scanner } from '../../functions/Scanner';
 import { WebUrl } from '../../api/config';
 import GridItem from '../../functions/GridItem';
 import GridContainer from '../../functions/GridContainer';
-import { Grid, TextField, Typography } from "@material-ui/core";
+import { Grid, TextField, InputAdornment, IconButton, Typography } from "@material-ui/core";
+import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 
 class CreateProduct extends Component {
 
@@ -52,7 +53,7 @@ class CreateProduct extends Component {
         })
     }
     onChangeQuantity(e) {
-        if (Number(e.target.value)) {
+        if (Number(e.target.value) || e.target.value === "") {
             this.setState({
                 quantity: e.target.value
             })
@@ -91,7 +92,8 @@ class CreateProduct extends Component {
     }
 
     componentDidMount() {
-        axios.get('/categories')
+        const token = localStorage.getItem('token')
+        axios.get('/categories', { headers: { authorization: token } })
             .then(response => this.setState({ categori: response.data.data }))
 
         if (this.props.location.state) {
@@ -109,10 +111,11 @@ class CreateProduct extends Component {
     }
 
     editCode = e => {
-        axios.get(WebUrl + `/products/${"_" + e}`)
+        const token = localStorage.getItem('token')
+        axios.get(WebUrl + `/products/${"_" + e}`, { headers: { authorization: token } })
             .then(res => {
                 console.log(res);
-                if (res.data.data) {
+				if (res && res.data && res.data.data) {
                     console.log("Hittad artikel!")
                     console.log(res.data.data)
                     alert("Scankoden finns redan för " + res.data.data[0]['name']);
@@ -166,11 +169,22 @@ class CreateProduct extends Component {
                                             onChange={this.onChangeDescription}
                                             placeholder="Beskrivning av produkten"
                                         />
-                                        <Form.Group >
-                                            <Form.Label>Scankod</Form.Label>
-                                            <Form.Control name="code" value={this.state.code} placeholder="Tryck för att skanna in kod" onClick={this.changeScanner} onChange={this.onChangeImage} />
-                                        </Form.Group>
-
+                                            <TextField
+                                                label="Scankod"
+                                                id="Scankod"
+                                                name="code"
+                                                style={{ width: "100%" }}
+                                                onChange={this.onChangeImage}
+                                                value={this.state.code}
+                                                InputProps={{
+                                                    endAdornment:
+                                                        <InputAdornment position='end'>
+                                                            <IconButton aria-label="timpriset" size="small" color="primary" onClick={this.changeScanner} >
+                                                                <AddAPhotoIcon />
+                                                            </IconButton>
+                                                        </InputAdornment>
+                                                }}
+                                            />
                                         <GridContainer>
                                             <GridItem xs={6} sm={6} md={6}>
                                                 <Form.Group >
@@ -182,11 +196,10 @@ class CreateProduct extends Component {
                                                 <Form.Group >
                                                     <Form.Label >Välj Enhet</Form.Label>
                                                     <Form.Control as="select" name="unit" onChange={this.onChangeCategory} required>
-                                                        <option selected>-- Välj Enhet --</option>
-                                                        {this.state.categori.map(item => {
+                                                        {this.state.categori ? this.state.categori.map(item => {
                                                             return <option value={item.unit} key={item.id}>{item.unit}</option>
-                                                        })
-                                                        }
+                                                        }) 
+                                                        : ""}
                                                     </Form.Control>
                                                 </Form.Group>
                                             </GridItem>

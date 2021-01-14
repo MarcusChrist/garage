@@ -3,7 +3,7 @@ import { WebUrl } from '../../api/config';
 
 
 export default class AuthService {
-    
+
     // Initializing important variables
     constructor(domain) {
         this.domain = domain || WebUrl + '/user' // API server domain
@@ -28,6 +28,7 @@ export default class AuthService {
             } else {
                 console.log("logged in!")
                 this.setToken(res.token) // Setting the token in localStorage
+                this.setCompany(res.company) // Setting the company in localStorage
                 return Promise.resolve(res);
             }
         })
@@ -57,6 +58,10 @@ export default class AuthService {
         // Saves user token to localStorage
         localStorage.setItem('token', idToken)
     }
+    setCompany(company) {
+        // Saves user company to localStorage
+        localStorage.setItem('company', company)
+    }
 
     getToken() {
         // Retrieves the user token from localStorage
@@ -66,6 +71,7 @@ export default class AuthService {
     logout() {
         // Clear user token and profile data from localStorage
         localStorage.removeItem('token');
+        localStorage.removeItem('company');
     }
 
     getConfirm = () => {
@@ -73,7 +79,7 @@ export default class AuthService {
         let answer = decode(this.getToken());
         console.log("Recieved answer!");
         return answer;
-      };
+    };
 
 
     fetch(url, options) {

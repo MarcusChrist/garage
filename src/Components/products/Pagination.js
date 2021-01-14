@@ -33,9 +33,10 @@ class Pagination extends Component {
 	}
 	editCode = e => {
 		console.log(e);
-		axios.get(WebUrl + '/products?codefinder=_' + e)
+        const token = localStorage.getItem('token')
+        axios.get(WebUrl + '/products/_' + e, { headers: { authorization: token } })
 			.then(res => {
-				if (res.data.data) {
+				if (res && res.data && res.data.data) {
 					console.log(e);
 					console.log(res.data.data)
 					this.props.fixHist.replace('/products/edit/' + res.data.data[0].id);

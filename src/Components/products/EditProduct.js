@@ -40,22 +40,31 @@ class EditProduct extends Component {
     componentDidMount() {
         const { id } = this.props.match.params;
         this.setState({ mobile: this.mobileAndTabletCheck() })
-        axios.get(WebUrl + `/products/${id}`)
+        const token = localStorage.getItem('token')
+        axios.get(WebUrl + `/products/${id}`, { headers: { authorization: token } })
             .then(res => {
-                for (var key in res.data.data[0]) {
-                    if (key === 'history') {
-                        if (res.data.data[0][key] !== "") {
-                            this.setState({ [key]: JSON.parse(res.data.data[0][key]) });
-                        }
+                if (res.data.status === 404) {
+                    if (id.substr(0, 1) === "_") {
+                        this.props.history.replace("/add");
                     } else {
-                        this.setState({ [key]: res.data.data[0][key] });
+                        this.props.history.replace("/")
                     }
+                } else {
+                    for (var key in res.data.data[0]) {
+                        if (key === 'history') {
+                            if (res.data.data[0][key] !== "") {
+                                this.setState({ [key]: JSON.parse(res.data.data[0][key]) });
+                            }
+                        } else {
+                            this.setState({ [key]: res.data.data[0][key] });
+                        }
+                    }
+                    this.setState({ ['counted']: res.data.data[0]['quantity'] })
                 }
-                this.setState({ ['counted']: res.data.data[0]['quantity'] })
             })
             .catch(err => console.log(err))
 
-        axios.get(WebUrl + '/categories')
+        axios.get(WebUrl + '/categories', { headers: { authorization: token } })
             .then(response => this.setState({ categories: response.data.data }))
     }
     mobileAndTabletCheck = function () {
@@ -73,9 +82,10 @@ class EditProduct extends Component {
     }
 
     editCode = e => {
-        axios.get(WebUrl + '/products?codefinder=_' + e)
+        const token = localStorage.getItem('token')
+        axios.get(WebUrl + '/products/_' + e, { headers: { authorization: token } })
             .then(res => {
-                if (res.data.data) {
+				if (res && res.data && res.data.data) {
                     console.log(res.data.data);
                     console.log("Hittad artikel!");
                     if (res.data.data[0]['id'] === this.state.id) return;
@@ -125,7 +135,6 @@ class EditProduct extends Component {
             .then(() => {
                 this.setState({ locked: true, id: "", code: "", name: "", quantity: 0, unit: "", info: "", history: "", counted: 0, autoOpened: true, openScanner: true });
             });
-
     }
 
     getOut = () => {
@@ -147,20 +156,6 @@ class EditProduct extends Component {
         this.setState({ [e.target.name]: e.target.value })
     }
 
-    delete = () => {
-        const answer = window.confirm("Vill du verkligen ta bort denna produkt permanent?");
-        if (answer) {
-            const token = localStorage.getItem('token');
-
-            axios.delete('/products/' + this.state.id, { headers: { authorization: token } })
-                .then(this.getOut)
-                .catch((err) => {
-                    console.log(err);
-                    this.getOut()
-                });
-        }
-
-    }
     doSetTimeout = (i) => {
         setTimeout(() => {
             if (this.state.addUp) {
@@ -178,7 +173,7 @@ class EditProduct extends Component {
             this.doSetTimeout(400);
         }
     }
-    
+
     handleButtonPressLong = () => {
         if (!this.state.mobile) {
             this.setState({ counted: Number(this.state.counted + 1) });
@@ -189,6 +184,21 @@ class EditProduct extends Component {
 
     handleButtonRelease = () => {
         this.setState({ addUp: false });
+    }
+
+    delete = () => {
+        const answer = window.confirm("Vill du verkligen ta bort denna produkt permanent?");
+        if (answer) {
+            const token = localStorage.getItem('token');
+
+            axios.delete('/products/' + this.state.id, { headers: { authorization: token } })
+                .then(this.getOut)
+                .catch((err) => {
+                    console.log(err);
+                    this.getOut()
+                });
+        }
+
     }
 
     render() {
@@ -225,10 +235,8 @@ class EditProduct extends Component {
                                                 value={quantity ? quantity : 0}
                                                 style={{ width: "100%" }}
                                                 onChange={val => {
-                                                    if (Number(val.target.value)) {
-                                                        this.setState({ quantity: val.target.value, counted: val.target.value });
-                                                    } else if (val.target.value === "" || val.target.value === "0") {
-                                                        this.setState({ quantity: "0", counted: "0" });
+                                                    if (Number(val.target.value) || val.target.value === "") {
+                                                        this.setState({ counted: val.target.value, quantity: val.target.value })
                                                     }
                                                 }}
                                             //className={classes.textfield}
@@ -257,8 +265,8 @@ class EditProduct extends Component {
                                             <GridContainer>
                                                 <GridItem xs={6} sm={6} md={5}>
                                                     <Grid container direction="column">
-                                                        <Button onTouchStart={this.handleButtonPress} 
-                                                        onTouchEnd={this.handleButtonRelease} onMouseDown={this.handleButtonPressLong}
+                                                        <Button onTouchStart={this.handleButtonPress}
+                                                            onTouchEnd={this.handleButtonRelease} onMouseDown={this.handleButtonPressLong}
                                                             onMouseUp={this.handleButtonRelease} onMouseLeave={this.handleButtonRelease} variant="success"
                                                             type="button" style={{ marginBottom: "30px", height: "90px" }}>
                                                             +
@@ -269,13 +277,13 @@ class EditProduct extends Component {
                                                     <TextField
                                                         label="Inventerat Antal"
                                                         id="antal2"
-                                                        value={counted ? counted : "0"}
+                                                        value={counted}
                                                         style={{ width: "100%", marginBottom: "30px" }}
                                                         onChange={val => {
-                                                            if (Number(val.target.value)) {
-                                                                this.setState({ counted: val.target.value });
-                                                            } else if (val.target.value === "" || val.target.value === "0") {
-                                                                this.setState({ counted: "0" });
+                                                            if (Number(val.target.value) || val.target.value === "") {
+                                                                this.setState({
+                                                                    counted: val.target.value
+                                                                })
                                                             }
                                                         }}
                                                         inputProps={{ style: { fontSize: 50 } }} // font size of input text
@@ -308,14 +316,9 @@ class EditProduct extends Component {
                                                             </Button>
                                                     </GridItem>
                                                     <GridItem xs={6} sm={6} md={7}>
-                                                        <Grid container direction="row" justify="space-between">
-                                                            <Button variant="warning" type="submit" onClick={this.getOut} style={{ marginBottom: "15px" }}>
-                                                                Avbryt
+                                                        <Button variant="warning" type="submit" onClick={this.getOut} style={{ marginBottom: "15px", width: "100%" }}>
+                                                            Avbryt
                                                             </Button>
-                                                            <Button variant="danger" type="submit" onClick={this.delete} style={{ marginBottom: "15px" }}>
-                                                                Radera
-                                                            </Button>
-                                                        </Grid>
                                                     </GridItem>
                                                 </Grid>
                                             </GridContainer>
@@ -376,6 +379,9 @@ class EditProduct extends Component {
                                     </TableBody>
                                 </Table>
                                 : ""}
+                            <Button variant="danger" type="submit" onClick={this.delete} style={{ marginTop: "15px" }}>
+                                Radera
+                            </Button>
                         </GridItem>
                     </GridContainer>
                 }

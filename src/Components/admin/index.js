@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Form, Button, Row, Col, Container } from 'react-bootstrap';
 import { Link, Redirect } from 'react-router-dom';
 import axios from 'axios';
-import { Scanner } from '../../functions/Scanner';
 import GridItem from '../../functions/GridItem';
 import GridContainer from '../../functions/GridContainer';
 import CardBody from '../../functions/CardBody';
@@ -42,12 +41,12 @@ const defaultState = {
     importTable: false,
     units: [],
     totals: 0,
-    catChoice: catChoices[0],
+    catChoice: "",
     catChosen: "",
     catName: "",
 }
 
-class Lists extends Component {
+class Admin extends Component {
     state = defaultState;
 
     hiddenGetFile = React.createRef();
@@ -122,7 +121,8 @@ class Lists extends Component {
         var limit = '9999';
         var page = '1';
 
-        axios.get(`/products?search=${search}&sortBy=${sortBy}&sort=${sort}&limit=${limit}&page=${page}`)
+        const token = localStorage.getItem('token')
+        axios.get(`/products?search=${search}&sortBy=${sortBy}&sort=${sort}&limit=${limit}&page=${page}`, { headers: { authorization: token } })
             .then(res => {
                 var temp = res.data.data;
                 for (var i = 0; i < temp.length; i++) {
@@ -133,23 +133,40 @@ class Lists extends Component {
             .catch(err => console.log(err));
 
     }
-
     catStart = () => {
+        if (this.state.catChoice === "") {
+            alert("Tror du missat något!");
+            return;
+        }
         const token = localStorage.getItem('token');
 
-        if (this.state.catChoice === "Lägg till" && this.state.catName !== "") {
-            axios.post('/categories', { unit: this.state.catName }, { headers: { authorization: token } })
-                .then((response) => {
-                    this.refreshPage();
-                    console.log(response);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
+        if (this.state.catChoice === "Lägg till") {
+            if (this.state.catName === "") {
+                alert("Tror du missat något!");
+                return;
+            }
+            const result = this.state.units.find( ({unit}) => unit === this.state.catName);
+            if (result) {
+                alert("Denna enhet används redan!");
+                return;
+            } else {
+                axios.post('/categories', { unit: this.state.catName }, { headers: { authorization: token } })
+                    .then((response) => {   
+                        this.refreshPage();
+                        console.log(response);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            }
 
         } else if (this.state.catChoice === "Ta bort") {
+            if (this.state.catChosen === "") {
+                alert("Tror du missat något!");
+                return;
+            }
             //%% Gör även en update på alla som har denna enhet
-            axios.delete('/categories/' + this.state.catChosen.id, { headers: { authorization: token } })
+            axios.delete('/categories/' + this.state.catChosen, { headers: { authorization: token } })
                 .then((response) => {
                     this.refreshPage();
                     console.log(response);
@@ -159,14 +176,24 @@ class Lists extends Component {
                 });
 
         } else if (this.state.catChoice === "Ändra") {
-            axios.patch('/categories/' + this.state.catChosen.id, { unit: this.state.catName }, { headers: { authorization: token } })
-                .then((response) => {
-                    this.refreshPage();
-                    console.log(response);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
+            if (this.state.catChosen === "" || this.state.catName === "") {
+                alert("Tror du missat något!");
+                return;
+            }
+            const result = this.state.units.find( ({unit}) => unit === this.state.catName);
+            if (result) {
+                alert("Den nya enheten används redan!");
+                return;
+            } else {
+                axios.patch('/categories/' + this.state.catChosen, { unit: this.state.catName }, { headers: { authorization: token } })
+                    .then((response) => {
+                        this.refreshPage();
+                        console.log(response);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            }
             //Ändra alla i en kategori till en annan som redan finns och ta bort den gamla kategorin
         }
     }
@@ -174,8 +201,14 @@ class Lists extends Component {
     refreshPage = () => {
         this.setState(defaultState);
 
-        axios.get('/categories')
-            .then(response => this.setState({ units: response.data.data }))
+        const token = localStorage.getItem('token')
+        axios.get('/categories', { headers: { authorization: token } })
+            .then((response) => { 
+                if (response) {
+                    console.log(response.data.data);
+                    this.setState({ units: response.data.data }) 
+                }
+            })
     }
 
     render() {
@@ -326,8 +359,15 @@ class Lists extends Component {
                             </AccordionSummary>
                             <AccordionDetails>
                                 <GridContainer style={{ width: "100%" }}>
-                                    <GridItem xs={12} sm={4} md={2}>
-                                        <FormControl style={{ width: "100%" }}>
+                                    <GridItem xs={6} sm={4} md={2}>
+                                        <select defaultValue="Välj händelse" className="form-control" name="unitSelect1" onChange={val => this.setState({ catChoice: val.target.value })}>
+                                            <option disabled>Välj händelse</option>
+                                            {catChoices.map(item => {
+                                                return <option key={item} value={item}>{item}</option>
+                                            })}
+                                        </select>
+                                        <div style={{ marginBottom: "20px" }}></div>
+                                        {/* <FormControl style={{ width: "100%" }}>
                                             <InputLabel id="mittNamn2">Händelse</InputLabel>
                                             <Select
                                                 labelId="mittNamn2"
@@ -339,11 +379,17 @@ class Lists extends Component {
                                                     return <MenuItem value={item} key={item}>{item}</MenuItem>
                                                 })}
                                             </Select>
-                                        </FormControl>
+                                        </FormControl> */}
                                     </GridItem>
                                     {this.state.catChoice === "Ändra" ?
-                                        <GridItem xs={12} sm={3} md={2}>
-                                            <FormControl style={{ width: "100%" }}>
+                                        <GridItem xs={6} sm={3} md={2}>
+                                            <select defaultValue="Välj enhet" className="form-control" name="unitSelect2" onChange={val => this.setState({ catChosen: val.target.value })}>
+                                                <option disabled>Välj enhet</option>
+                                                {this.state.units.map(item => {
+                                                    return <option key={item.id} value={item.id}>{item.unit}</option>
+                                                })}
+                                            </select>
+                                            {/* <FormControl style={{ width: "100%" }}>
                                                 <InputLabel id="foundcat3a">Enhet</InputLabel>
                                                 <Select
                                                     labelId="foundcata"
@@ -355,49 +401,57 @@ class Lists extends Component {
                                                         return <MenuItem value={item} key={item.id}>{item.unit}</MenuItem>
                                                     })}
                                                 </Select>
-                                            </FormControl>
+                                            </FormControl> */}
                                         </GridItem>
                                         : <></>}
-                                    <GridItem xs={10} sm={3} md={2}>
-                                        {this.state.catChoice === "Lägg till" || this.state.catChoice === "Ändra" ?
+                                    {this.state.catChoice === "Lägg till" || this.state.catChoice === "Ändra" ?
+                                        <GridItem xs={6} sm={3} md={2}>
                                             <TextField
                                                 label="Nytt Namn"
                                                 id="kommantarer"
                                                 value={this.state.catName ? this.state.catName : ""}
-                                                style={{ width: "100%" }}
-                                                onChange={val => { this.setState({ ['catName']: val.target.value }); }}
+                                                style={{ width: "100%", marginTop: "-12px" }}
+                                                onChange={val => { this.setState({'catName': val.target.value }); }}
                                             />
-                                            : <></>}
-                                        {this.state.catChoice === "Ta bort" ?
-                                            <FormControl style={{ width: "100%" }}>
-                                                <InputLabel id="foundcat3">Enhet</InputLabel>
-                                                <Select
-                                                    labelId="foundcat2"
-                                                    id="foundcat1"
-                                                    value={this.state.catChosen}
-                                                    onChange={val => this.setState({ catChosen: val.target.value })}
-                                                >
-                                                    {this.state.units.map(item => {
-                                                        return <MenuItem value={item} key={item.id}>{item.unit}</MenuItem>
-                                                    })}
-                                                </Select>
-                                            </FormControl>
-                                            : <></>}
-                                    </GridItem>
-                                    <GridItem xs={2} sm={2} md={1}>
-                                        <Button variant="primary" onClick={this.catStart} style={{ marginTop: "12px" }}>
-                                            OK
-                                                 </Button>
-                                    </GridItem>
+                                        </GridItem>
+                                        : <></>}
+                                    {this.state.catChoice === "Ta bort" ?
+                                        <GridItem xs={6} sm={3} md={2}>
+                                            <select defaultValue="Enhet" className="form-control" name="unitSelect3" onChange={val => this.setState({ catChosen: val.target.value })}>
+                                                <option disabled>Enhet</option>
+                                                {this.state.units.map(item => {
+                                                    return <option key={item.id} value={item.id}>{item.unit}</option>
+                                                })}
+                                            </select>
+                                        </GridItem>
+                                        // <FormControl style={{ width: "100%" }}>
+                                        //     <InputLabel id="foundcat3">Enhet</InputLabel>
+                                        //     <Select
+                                        //         labelId="foundcat2"
+                                        //         id="foundcat1"
+                                        //         value={this.state.catChosen}
+                                        //         onChange={val => this.setState({ catChosen: val.target.value })}
+                                        //     >
+                                        //         {this.state.units.map(item => {
+                                        //             return <MenuItem value={item} key={item.id}>{item.unit}</MenuItem>
+                                        //         })}
+                                        //     </Select>
+                                        // </FormControl>
+                                        : <></>}
+                                <GridItem xs={2} sm={2} md={1}>
+                                    <Button variant="primary" onClick={this.catStart} disabled={this.state.catChoice === ""}>
+                                        OK
+                                        </Button>
+                                </GridItem>
                                 </GridContainer>
-                                <div style={{ marginBottom: "20px" }}></div>
+                            <div style={{ marginBottom: "20px" }}></div>
                             </AccordionDetails>
                         </Accordion>
                     </CardBody>
                 </Card>
-            </div>
+            </div >
         );
     }
 }
-export default Lists;
+export default Admin;
 
